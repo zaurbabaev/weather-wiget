@@ -15,7 +15,7 @@ function App() {
           `http://api.weatherapi.com/v1/current.json?key=${KEY}&q=${city}`,
         );
         console.log(res);
-
+        // Serverin verdiyi exception mesajını çıxarmaq üçün
         if (!res.ok) {
           throw new Error(`${res.status} ${res.statusText}`);
         }
