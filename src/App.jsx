@@ -21,9 +21,11 @@ function App() {
           setError(data.error.message);
         }
         setWeatherData(data);
+        // error olmasa uğurlu əməliyyat olsa o zaman erroru ilkin dəyərinə nulla qaytamalıyıq
         setError(null);
       } catch (err) {
         setError(err.message);
+        // error oldusa catcha o tutulur o zaman weatherDatanı ilkin dəyərinə qaytarırıq.
         setWeatherData(null);
       }
     }
