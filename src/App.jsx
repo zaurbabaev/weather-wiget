@@ -4,17 +4,43 @@ import "./index.css";
 const KEY = "96588a0a9b8649bc917103715260102";
 
 function App() {
-  const [city, setCity] = useState("Baku");
+  const [city, setCity] = useState("");
   const [weatherData, setWeatherData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [coords, setCoords] = useState(null);
 
   useEffect(() => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        console.log(position);
+
+        const { latitude, longitude } = position.coords;
+        setCoords({ latitude, longitude });
+      },
+      (err) => {
+        console.error("Geolocation error", err.message);
+        setError("Failed to get your loaction");
+      },
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!city.trim() && !coords) {
+      return;
+    }
+
     async function getData() {
       setLoading(true);
       try {
+        const query =
+          city.trim() ? city : `${coords.latitude},${coords.longitude}`;
         const res = await fetch(
-          `http://api.weatherapi.com/v1/current.json?key=${KEY}&q=${city}`,
+          `http://api.weatherapi.com/v1/current.json?key=${KEY}&q=${query}`,
         );
 
         const data = await res.json();
@@ -34,7 +60,7 @@ function App() {
       }
     }
     getData();
-  }, [city]);
+  }, [city, coords]);
 
   console.log(weatherData);
 
@@ -84,7 +110,7 @@ function App() {
         </div>
         {error && renderError()}
         {loading && renderLoading()}
-        {!loading && !renderError && weatherData && renderWeather}
+        {!loading && !error && weatherData && renderWeather()}
       </div>
     </div>
   );
