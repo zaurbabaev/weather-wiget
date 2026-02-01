@@ -4,7 +4,7 @@ import "./index.css";
 const KEY = "96588a0a9b8649bc917103715260102";
 
 function App() {
-  const [city, setCity] = useState("London");
+  const [city, setCity] = useState("Lo");
   const [weatherData, setWeatherData] = useState(null);
   const [error, setError] = useState(null);
 
@@ -14,16 +14,17 @@ function App() {
         const res = await fetch(
           `http://api.weatherapi.com/v1/current.json?key=${KEY}&q=${city}`,
         );
-        console.log(res);
-        // Serverin verdiyi exception mesajını çıxarmaq üçün
-        if (!res.ok) {
-          throw new Error(`${res.status} ${res.statusText}`);
-        }
+
         const data = await res.json();
+        console.log(data);
+        if (data.error) {
+          setError(data.error.message);
+        }
         setWeatherData(data);
+        setError(null);
       } catch (err) {
-        console.log(err);
         setError(err.message);
+        setWeatherData(null);
       }
     }
     getData();
@@ -35,7 +36,7 @@ function App() {
     <div className="app">
       <div className="widget-container">
         <div className="weather-card-container">
-          <h1 className="app-title">{error}</h1>
+          <h1 className="app-title">Weather Widget</h1>
           <div className="search-container">
             <input
               type="text"
