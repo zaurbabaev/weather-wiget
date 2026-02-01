@@ -4,7 +4,7 @@ import "./index.css";
 const KEY = "96588a0a9b8649bc917103715260102";
 
 function App() {
-  const [city, setCity] = useState("Lo");
+  const [city, setCity] = useState("");
   const [weatherData, setWeatherData] = useState(null);
   const [error, setError] = useState(null);
 
@@ -16,21 +16,21 @@ function App() {
         );
 
         const data = await res.json();
-        console.log(data);
+
         if (data.error) {
           setError(data.error.message);
+          setWeatherData(null);
+          return;
         }
         setWeatherData(data);
-        // error olmasa uğurlu əməliyyat olsa o zaman erroru ilkin dəyərinə nulla qaytamalıyıq
         setError(null);
-      } catch (err) {
-        setError(err.message);
-        // error oldusa catcha o tutulur o zaman weatherDatanı ilkin dəyərinə qaytarırıq.
+      } catch {
+        setError("Failed to fetch weather data");
         setWeatherData(null);
       }
     }
     getData();
-  }, []);
+  }, [city]);
 
   console.log(weatherData);
 
@@ -41,21 +41,25 @@ function App() {
           <h1 className="app-title">Weather Widget</h1>
           <div className="search-container">
             <input
+              value={city}
               type="text"
               placeholder="Enter city name"
               className="search-input"
+              onChange={(e) => setCity(e.target.value)}
             />
           </div>
         </div>
         <div className="weather-card">
           <h2>{`${weatherData?.location?.name}, ${weatherData?.location?.country}`}</h2>
           <img
-            src={weatherData?.current.condition.icon}
+            src={`https:${weatherData?.current.condition.icon}`}
             alt="icon"
             className="weather-icon"
           />
-          <p className="temperature">{weatherData?.current?.temp_c}°C</p>
-          <p className="condition">{weatherData?.current?.text}</p>
+          <p className="temperature">
+            {Math.round(weatherData?.current?.temp_c)}°C
+          </p>
+          <p className="condition">{weatherData?.current?.condition?.text}</p>
           <div className="weather-details">
             <p>Humidity: {weatherData?.current?.humidity}%</p>
             <p>Wind: {weatherData?.current?.wind_kph} km/h</p>
