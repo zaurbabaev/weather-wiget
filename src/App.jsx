@@ -6,14 +6,25 @@ const KEY = "96588a0a9b8649bc917103715260102";
 function App() {
   const [city, setCity] = useState("London");
   const [weatherData, setWeatherData] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function getData() {
-      const res = await fetch(
-        `http://api.weatherapi.com/v1/current.json?key=${KEY}&q=${city}`,
-      );
-      const data = await res.json();
-      setWeatherData(data);
+      try {
+        const res = await fetch(
+          `http://api.weatherapi.com/v1/current.json?key=${KEY}&q=${city}`,
+        );
+        console.log(res);
+
+        if (!res.ok) {
+          throw new Error(`${res.status} ${res.statusText}`);
+        }
+        const data = await res.json();
+        setWeatherData(data);
+      } catch (err) {
+        console.log(err);
+        setError(err.message);
+      }
     }
     getData();
   }, []);
@@ -24,27 +35,27 @@ function App() {
     <div className="app">
       <div className="widget-container">
         <div className="weather-card-container">
-          <h1 className="app-title">Weather Widget</h1>
+          <h1 className="app-title">{error}</h1>
           <div className="search-container">
             <input
               type="text"
               placeholder="Enter city name"
               className="search-input"
             />
-          </div> 
+          </div>
         </div>
         <div className="weather-card">
-          <h2>{`${weatherData?.location.name}, ${weatherData?.location.country}`}</h2>
+          <h2>{`${weatherData?.location?.name}, ${weatherData?.location?.country}`}</h2>
           <img
             src={weatherData?.current.condition.icon}
             alt="icon"
             className="weather-icon"
           />
-          <p className="temperature">{weatherData?.current.temp_c}°C</p>
-          <p className="condition">{weatherData?.current.text}</p>
+          <p className="temperature">{weatherData?.current?.temp_c}°C</p>
+          <p className="condition">{weatherData?.current?.text}</p>
           <div className="weather-details">
-            <p>Humidity: {weatherData?.current.humidity}%</p>
-            <p>Wind: {weatherData?.current.wind_kph} km/h</p>
+            <p>Humidity: {weatherData?.current?.humidity}%</p>
+            <p>Wind: {weatherData?.current?.wind_kph} km/h</p>
           </div>
         </div>
       </div>
